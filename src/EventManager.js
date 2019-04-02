@@ -25,12 +25,12 @@ class EventManager {
     listeners.splice(listeners.indexOf(func), 1)
   }
   createEvent(name) {
-    if (typeof name != 'string' || eventName.length < 1) throw new Error("Must supply a non-empty string")
+    if (typeof name != 'string' || name.length < 1) throw new Error("Must supply a non-empty string")
     if (this.eventListeners.hasOwnProperty(name)) throw new Error("Event already exists")
     this.eventListeners[name] = []
   }
   createEvents(names) {
-    if (!Array.isArray(names) || names.length < 1 || names.some(name => typeof name != 'string' || name.length < 1)) throw new Error("Names must be an array of non-empty strings")\
+    if (!Array.isArray(names) || names.length < 1 || names.some(name => typeof name != 'string' || name.length < 1)) throw new Error("Names must be an array of non-empty strings")
     names.forEach(name => this.createEvent(name))
   }
 }
