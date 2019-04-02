@@ -1,9 +1,13 @@
+const EventManager = require("./EventManager")
 const AquaPipe = require("./AquaPipe")
 
-class Aquadux {
+class Aquadux extends EventManager {
   constructor() {
+    super()
+    this.started = false
+    this.finished = false
     this.pipes = {}
-    this.eventListeners = {}
+    this.createEvents(['started', 'finished', 'success', 'failure'])
   }
   createPipe(name, func, options={}) {
     if (typeof func != 'function') throw new Error("Function input must be a function")

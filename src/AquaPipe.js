@@ -1,12 +1,15 @@
-class AquaPipe {
+const EventManager = require('./EventManager')
+
+class AquaPipe extends EventManager {
   constructor(pipeline, name, func, options) {
+    super()
     this.pipeline = pipeline
     this.func = func
     this.name = name
     this.options = options
     this.finished = false
     this.started = false
-    this.listeners = {started: [], finished: [], success: [], failure: [], done: []}
+    this.createEvents(['started', 'finished', 'success', 'failure'])
     this.waitingFor = []
     this.data = {}
   }
@@ -69,15 +72,7 @@ class AquaPipe {
     this.on('failure', func)
   }
   finally(func) {
-    this.on('done', func)
-  }
-  on(eventName, func) {
-    if (typeof eventName != 'string' || eventName.length < 1) throw new Error("Must supply a non-empty string")
-    if (typeof func != 'function') throw new Error("Must supply a function")
-    if (!this.eventListeners.hasOwnProperty(eventName)) throw new Error("Invalid Event Name")
-    const listeners = this.eventListeners[eventName]
-    if (listeners.includes(func)) return console.warn(new Error("Listener Already Registered"))
-    listeners.push(func)
+    this.on('finished', func)
   }
 }
 

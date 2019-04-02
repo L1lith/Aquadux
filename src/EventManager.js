@@ -13,6 +13,9 @@ class EventManager {
     if (listeners.includes(func)) return console.warn(new Error("Listener Already Registered"))
     listeners.push(func)
   }
+  addEventListener(eventName, func) {
+    return this.on(eventName, func)
+  }
   removeEventListener(eventName, func) {
     if (typeof eventName != 'string' || eventName.length < 1) throw new Error("Must supply a non-empty string")
     if (typeof func != 'function') throw new Error("Must supply a function")
