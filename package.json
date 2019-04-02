@@ -1,0 +1,28 @@
+{
+  "name": "aquadux",
+  "version": "0.0.1",
+  "description": "Easy dependency injection and promise pipelining",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L1lith/Aquadux.git"
+  },
+  "keywords": [
+    "promise",
+    "pipeline",
+    "dependency",
+    "injection"
+  ],
+  "author": "L1lith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/L1lith/Aquadux/issues"
+  },
+  "homepage": "https://github.com/L1lith/Aquadux#readme",
+  "dependencies": {
+    "auto-bind": "^2.0.0"
+  }
+}
