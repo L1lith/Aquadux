@@ -1,12 +1,15 @@
+const autoBind = require("auto-bind")
 const EventManager = require('./EventManager')
 
 class AquaPipe extends EventManager {
   constructor(pipeline, name, func, options) {
     super()
+    autoBind(this)
     this.pipeline = pipeline
     this.func = func
     this.name = name
     this.options = options
+    this.dependants = []
     this.finished = false
     this.started = false
     this.createEvents(['started', 'finished', 'success', 'failure'])
@@ -14,8 +17,10 @@ class AquaPipe extends EventManager {
     this.data = {}
   }
   waitFor(pipeName) {
+    if (this.started || this.finished) throw new Error("Already started, cannot wait for anything else.")
     const pipe = this.pipeline.getPipe(pipeName)
     if (this.waitingFor.includes(pipe)) throw new Error("Already waiting for that pipe")
+    pipe.dependants.push(this)
     this.waitingFor.push(pipe)
     pipe.finally(() => {
       const index = this.waitingFor.indexOf(pipe)
@@ -25,6 +30,7 @@ class AquaPipe extends EventManager {
     })
   }
   requireOutput(pipeName) {
+    if (this.started || this.finished) throw new Error("Already started, cannot wait for anything else.")
 
   }
   checkReady() {

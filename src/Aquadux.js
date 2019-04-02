@@ -1,9 +1,11 @@
+const autoBind = require("auto-bind")
 const EventManager = require("./EventManager")
 const AquaPipe = require("./AquaPipe")
 
 class Aquadux extends EventManager {
   constructor() {
     super()
+    autoBind(this)
     this.started = false
     this.finished = false
     this.pipes = {}
@@ -25,6 +27,21 @@ class Aquadux extends EventManager {
   }
   start() {
 
+  }
+  detectCircularPipes() {
+    let duplicates = []
+    Object.entries(this.pipes).forEach(([pipeName, pipe]) => {
+      pipe.waitingOn.forEach(dependantPipe => {
+        if (dependantPipe.waitingOn.includes(pipe)) {
+          duplicates.push(pipe)
+          duplicates.push(dependantPipe)
+        }
+      })
+    })
+    duplicates = duplicates.filter((pipe, index) => {
+      return duplicates.indexOf(pipe) === index
+    })
+    return duplicates
   }
 }
 
