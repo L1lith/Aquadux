@@ -15,6 +15,10 @@ class AquaPipe extends EventManager {
     this.createEvents(['started', 'finished', 'success', 'failure'])
     this.waitingFor = []
     this.data = {}
+    this.promise = new Promise((resolve, reject) => {
+      this.then(resolve)
+      this.catch(reject)
+    })
   }
   waitFor(pipeName, useData=false) {
     if (this.started || this.finished) throw new Error("Already started, cannot wait for anything else.")
@@ -73,12 +77,15 @@ class AquaPipe extends EventManager {
   }
   then(func) {
     this.on('success', func)
+    return this.promise
   }
   catch(func) {
     this.on('failure', func)
+    return this.promise
   }
   finally(func) {
     this.on('finished', func)
+    return this.promise
   }
 }
 

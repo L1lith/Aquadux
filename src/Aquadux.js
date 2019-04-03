@@ -10,6 +10,10 @@ class Aquadux extends EventManager {
     this.finished = false
     this.pipes = {}
     this.createEvents(['started', 'finished', 'success', 'failure'])
+    this.promise = new Promise((resolve, reject)=>{
+      this.resolve = resolve
+      this.reject = reject
+    })
   }
   createPipe(name, func, options={}) {
     if (typeof func != 'function') throw new Error("Function input must be a function")
@@ -34,6 +38,21 @@ class Aquadux extends EventManager {
     const startingPipes = this.getStartingPipes()
     if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
     startingPipes.forEach(pipe => pipe.start())
+    Promise.all(Object.values(this.pipes).map(pipe => pipe.promise)).then(()=>{
+      this.finished = true
+      this.resolve(this.getOutput())
+    }).catch(error => {
+      this.finished = true
+      this.reject(error)
+    })
+    return this.promise
+  }
+  getOutput() {
+    const output = {}
+    Object.entries(this.pipes).forEach(([pipeName, pipe]) => {
+      output[pipeName] = pipe.output
+    })
+    return output
   }
   assureNotStarted() {
     if (this.started || this.finished) throw new Error("Aquadux already started")
