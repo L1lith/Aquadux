@@ -20,9 +20,9 @@ class AquaPipe extends EventManager {
       this.catch(reject)
     })
   }
-  waitFor(pipeName, useData=false) {
+  waitFor(pipe, useData=false) {
+    pipe = this.pipeline.resolvePipe(pipe)
     if (this.started || this.finished) throw new Error("Already started, cannot wait for anything else.")
-    const pipe = this.pipeline.getPipe(pipeName)
     if (this.waitingFor.includes(pipe)) throw new Error("Already waiting for that pipe")
     pipe.dependants.push(this)
     this.waitingFor.push(pipe)
@@ -34,8 +34,8 @@ class AquaPipe extends EventManager {
       this.checkReady()
     })
   }
-  dependUpon(pipeName) {
-    return this.waitFor(pipeName, true)
+  dependUpon(pipe) {
+    return this.waitFor(pipe, true)
   }
   checkReady() {
     if (this.waitingFor.length === 0 && this.pipeline.started === true && this.started === false) {

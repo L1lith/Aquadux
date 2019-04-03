@@ -16,6 +16,16 @@ class Aquadux extends EventManager {
       this.reject = reject
     })
   }
+  resolvePipe(nameOrPipe, throwIfNotFound=true) {
+    if (nameOrPipe instanceof AquaPipe) {
+      return nameOrPipe
+    } else if (typeof nameOrPipe == 'string' && nameOrPipe.length > 0) {
+      if (throwIfNotFound === true && !this.pipes.hasOwnProperty(nameOrPipe)) throw new Error(`No pipe found named "${nameOrPipe}"`)
+      return this.pipes[nameOrPipe] || null
+    } else {
+      throw new Error("Must supply a pipe or a pipe name")
+    }
+  }
   createPipe(name=null, func, options={}) {
     if (arguments.length < 1) throw new Error("Too Few Argument")
     if (arguments.length > 3) throw new Error("Too Many Arguments")
