@@ -1,6 +1,7 @@
 const autoBind = require("auto-bind")
 const EventManager = require("./EventManager")
 const AquaPipe = require("./AquaPipe")
+const findPipeDependencies = require('./functions/findPipeDependencies')
 
 class Aquadux extends EventManager {
   constructor() {
@@ -51,6 +52,11 @@ class Aquadux extends EventManager {
     if (options === null) options = {}
     const pipe = new AquaPipe(this, name, func, options)
     this.pipes[name] = pipe
+    const dependencies = findPipeDependencies(pipe)
+    dependencies.forEach(dependency => {
+      if (!this.pipes.hasOwnProperty(dependency)) console.warn(`Unable to find dependency "${dependency}"`)
+      pipe.dependUpon(this.pipes[dependency])
+    })
     return pipe
   }
   getPipe(name) {
