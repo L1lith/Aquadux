@@ -9,17 +9,35 @@ class Aquadux extends EventManager {
     this.started = false
     this.finished = false
     this.pipes = {}
+    this.totalUnnamedPipes = 0
     this.createEvents(['started', 'finished', 'success', 'failure'])
     this.promise = new Promise((resolve, reject)=>{
       this.resolve = resolve
       this.reject = reject
     })
   }
-  createPipe(name, func, options={}) {
+  createPipe(name=null, func, options={}) {
+    if (arguments.length < 1) throw new Error("Too Few Argument")
+    if (arguments.length > 3) throw new Error("Too Many Arguments")
+    if (arguments.length === 1) {
+      func=name
+      name=null
+    }
+    if (arguments.length === 2 && typeof arguments[0] == 'function') {
+      func = name
+      name = null
+      options = arguments[1]
+    }
     if (typeof func != 'function') throw new Error("Function input must be a function")
-    if (typeof name != 'string' || name.length < 1) throw new Error("Name must be an non-empty string")
+    if ((typeof name != 'string' || name.length < 1) && name !== null) throw new Error("Name must be either a non-empty string, null, or unsupplied.")
     if (typeof options != "object") throw new Error("Options must be an object or null")
-    if (this.pipes.hasOwnProperty(name)) throw new Error("Pipe name already taken")
+    if (typeof name == 'string') {
+      if (name.startsWith("unnamedPipe")) throw new Error("Sorry, this name is reserved.")
+      if (this.pipes.hasOwnProperty(name)) throw new Error("Pipe name already taken")
+    }
+    if (name === null) {
+      name = "unnamedPipe#" + ++this.totalUnnamedPipes
+    }
     if (options === null) options = {}
     const pipe = new AquaPipe(this, name, func, options)
     this.pipes[name] = pipe
