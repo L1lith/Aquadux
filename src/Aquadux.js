@@ -74,7 +74,6 @@ class Aquadux extends EventManager {
       }
       runningPipes.forEach(pipe => {
         const onFinish = ()=>{
-          console.log(pipe.name)
           runningPipes.splice(runningPipes.indexOf(pipe), 1)
           checkDone()
         }
