@@ -19,20 +19,30 @@ class Aquadux extends EventManager {
     if (options === null) options = {}
     const pipe = new AquaPipe(this, name, func, options)
     this.pipes[name] = pipe
+    return pipe
   }
   getPipe(name) {
-    if (typeof name != 'string' || string.length < 1) throw new Error("Name must be an non-empty string")
+    if (typeof name != 'string' || name.length < 1) throw new Error("Name must be an non-empty string")
     if (!this.pipes.hasOwnProperty(name)) throw new Error("That pipe does not exist")
     return this.pipes[name]
   }
   start() {
-
+    this.assureNotStarted()
+    this.started = true
+    const circularPipes = this.detectCircularPipes().map(pipe => pipe.name)
+    if (circularPipes.length > 0) throw new Error(`Found Circular Pipes: "${circularPipes.slice(0, 3).join("\", ") + "\"" + (circularPipes.length > 3 ? ", continued" : "")}`)
+    const startingPipes = this.getStartingPipes()
+    if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
+    startingPipes.forEach(pipe => pipe.start())
+  }
+  assureNotStarted() {
+    if (this.started || this.finished) throw new Error("Aquadux already started")
   }
   detectCircularPipes() {
     let duplicates = []
     Object.entries(this.pipes).forEach(([pipeName, pipe]) => {
-      pipe.waitingOn.forEach(dependantPipe => {
-        if (dependantPipe.waitingOn.includes(pipe)) {
+      pipe.waitingFor.forEach(dependantPipe => {
+        if (dependantPipe.waitingFor.includes(pipe)) {
           duplicates.push(pipe)
           duplicates.push(dependantPipe)
         }
@@ -42,6 +52,9 @@ class Aquadux extends EventManager {
       return duplicates.indexOf(pipe) === index
     })
     return duplicates
+  }
+  getStartingPipes() {
+    return Object.values(this.pipes).filter(pipe => pipe.waitingFor.length === 0)
   }
 }
 
