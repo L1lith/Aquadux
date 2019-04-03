@@ -64,6 +64,29 @@ class Aquadux extends EventManager {
     if (!this.pipes.hasOwnProperty(name)) throw new Error("That pipe does not exist")
     return this.pipes[name]
   }
+  runPipes(pipes) {
+    return new Promise((resolve, reject) => {
+      const runningPipes = [...pipes]
+      const checkDone = ()=>{
+        if (runningPipes.length === 0) {
+          resolve(this.getOutput())
+        }
+      }
+      runningPipes.forEach(pipe => {
+        const onFinish = ()=>{
+          console.log(pipe.name)
+          runningPipes.splice(runningPipes.indexOf(pipe), 1)
+          checkDone()
+        }
+        if (pipe.options.canFail === true) {
+          pipe.on('finished', onFinish)
+        } else {
+          pipe.on('success', onFinish)
+          pipe.on('failure', reject)
+        }
+      })
+    })
+  }
   start() {
     this.assureNotStarted()
     this.started = true
@@ -72,8 +95,7 @@ class Aquadux extends EventManager {
     const startingPipes = this.getStartingPipes()
     if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
     startingPipes.forEach(pipe => pipe.start())
-    Promise.all(Object.values(this.pipes).map(pipe => pipe.promise)).then(()=>{
-      const output = this.getOutput()
+    this.runPipes(Object.values(this.pipes)).then(output => {
       this.finish(output)
       this.eventListeners.success.forEach(listener => {
         listener(output)
@@ -94,7 +116,7 @@ class Aquadux extends EventManager {
   getOutput() {
     const output = {}
     Object.entries(this.pipes).forEach(([pipeName, pipe]) => {
-      output[pipeName] = pipe.output
+      output[pipeName] = pipe.result
     })
     return output
   }

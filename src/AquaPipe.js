@@ -19,6 +19,7 @@ class AquaPipe extends EventManager {
       this.then(resolve)
       this.catch(reject)
     })
+    this.promise.catch(/*Silence Unhandled Promise Warnings*/()=>{})
   }
   waitFor(pipe, useData=false) {
     pipe = this.pipeline.resolvePipe(pipe)
@@ -26,13 +27,18 @@ class AquaPipe extends EventManager {
     if (this.waitingFor.includes(pipe)) throw new Error("Already waiting for that pipe")
     pipe.dependants.push(this)
     this.waitingFor.push(pipe)
-    pipe.then(output => {
+    const onFinish = output => {
       const index = this.waitingFor.indexOf(pipe)
       if (index < 0) return
       this.waitingFor.splice(index, 1)
       if (useData === true) this.data[pipe.name] = output
       this.checkReady()
-    })
+    }
+    if (pipe.options.canFail === true) {
+      pipe.on('finished', onFinish)
+    } else {
+      pipe.on('success', onFinish)
+    }
   }
   dependUpon(pipe) {
     return this.waitFor(pipe, true)
