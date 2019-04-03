@@ -16,8 +16,9 @@ duct.createPipe('shopData', async ()=>{
   await timer(1000) // In reality we might be making a request to a backend
   return {cartItems: ["Blue Dress", "Red Overcoat"]}
 })
-const mainScript = duct.createPipe(({shopData}) => { // Aquadux automatically detects this script is dependant upon the shopData script, and waits for it to finish before calling this script
-  console.log(database)
+const mainScript = duct.createPipe(({shopData}) => { // Aquadux automatically detects this script is dependant upon the pipe named shopData, and waits for it to finish before calling this script
+  const {cartItems} = shopData
+  console.log(cartItems)
 })
 
 duct.start().then(pipeOutputs => {
