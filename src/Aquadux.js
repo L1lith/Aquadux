@@ -13,8 +13,8 @@ class Aquadux extends EventManager {
     this.totalUnnamedPipes = 0
     this.createEvents(['started', 'finished', 'success', 'failure'])
     this.promise = new Promise((resolve, reject)=>{
-      this.resolve = resolve
-      this.reject = reject
+      this.on('success', resolve)
+      this.on('failure', reject)
     })
   }
   resolvePipe(nameOrPipe, throwIfNotFound=true) {
@@ -73,13 +73,23 @@ class Aquadux extends EventManager {
     if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
     startingPipes.forEach(pipe => pipe.start())
     Promise.all(Object.values(this.pipes).map(pipe => pipe.promise)).then(()=>{
-      this.finished = true
-      this.resolve(this.getOutput())
+      const output = this.getOutput()
+      this.finish(output)
+      this.eventListeners.success.forEach(listener => {
+        listener(output)
+      })
     }).catch(error => {
-      this.finished = true
-      this.reject(error)
+      this.finish(error)
+      this.eventListeners.failure.forEach(listener => {
+        listener(error)
+      })
     })
+    this.eventListeners.started.forEach(listener => listener())
     return this.promise
+  }
+  finish(result) {
+    this.finished = true
+    this.eventListeners.finished.forEach(listener => listener(result))
   }
   getOutput() {
     const output = {}

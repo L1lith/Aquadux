@@ -51,8 +51,10 @@ class AquaPipe extends EventManager {
     try {
       output = this.func(this.data)
     } catch(error) {
+      this.eventListeners.started.forEach(listener => listener())
       return this.handleError(error)
     }
+    this.eventListeners.started.forEach(listener => listener())
     if (output instanceof Promise) {
       output.then(this.handleSuccess).catch(this.handleError)
     } else {
