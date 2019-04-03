@@ -12,7 +12,7 @@ function timer(ms) { // A simple timer function to help us simulate asynchronous
   return new Promise(res => setTimeout(res, ms))
 }
 
-duct.createPipe('shopData', async ()=>{
+dux.createPipe('shopData' /* Here we supply it a name so we can depend upon it later */, async ()=>{
   await timer(1000) // In reality we might be making a request to a backend
   return {cartItems: ["Blue Dress", "Red Overcoat"]}
 })
@@ -21,7 +21,7 @@ const mainScript = duct.createPipe(({shopData}) => { // Aquadux automatically de
   console.log(cartItems)
 })
 
-duct.start().then(pipeOutputs => {
+dux.start().then(pipeOutputs => {
   console.log(result) // returns {shopData: {cartItems: ["Blue Dress", "Red Overcoat"]}, "unnamedPipe#1": undefined}
 }).catch(error => {
   console.log(error) // The entire Aquadux rejects with the first error.
