@@ -29,8 +29,6 @@ dux.start().then(pipeOutputs => {
 ```
 
 ## Documentation
-
-
 ### The Aquadux Class
 #### The Basics
 The Aquadux class is the base of the library, when using the library you must first instantiate a Aquadux object
@@ -83,11 +81,12 @@ dux.start().then(pipeOutputs => {
 
 
 #### Dependency Detection Under the Hood
-How does Aquadux know each pipes dependent pipes? Well Aquadux specifically looks for the first input parameter of the function to be using [object deconstruction syntax](LinkToMDNDocsHere). As you can see above object deconstruction syntax looks like this `({googleHomePage})`. When Aquadux looks at the code of the function and sees the input parameters is using this syntax it takes the name of each object property we're using and automatically adds the pipe with that name as a dependency. If this doesn't make sense to you how Aquadux is doing this it's okay as long as you understand that using the deconstructive syntax is required to make Aquadux automatically make it a dependency.
+How does Aquadux know each pipes dependent pipes? Well Aquadux specifically looks for the first input parameter of the function to be using [object deconstruction syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter). As you can see above object deconstruction syntax looks like this `({googleHomePage})`. When Aquadux looks at the code of the function and sees the input parameters is using this syntax it takes the name of each object property we're using and automatically adds the pipe with that name as a dependency. If this doesn't make sense to you how Aquadux is doing this it's okay as long as you understand that using the deconstructive syntax is required to make Aquadux automatically make it a dependency.
 If you do not want to use the object deconstruction syntax but still want to have dependencies for your pipe, you can use the pipe method .dependUpon as documented below.
 
 
 ### The Pipe Object
+#### Pipe Creation Parameters
 When creating a pipe object it takes up to 3 parameters
 1. A name string (optional)
 2. The function for the pipe to run (required)
@@ -111,7 +110,7 @@ dux.createPipe('pipe1', ()=>{
   throw new Error("Unknown Error")
   return 12
 }, {canFail: true})
-dux.createPipe("pipe2", ({pipe1})=>{
+dux.createPipe(({pipe1})=>{
   console.log(pipe1) // Logs the error object once Aquadux runs
 })
 dux.start().then(()=>{
