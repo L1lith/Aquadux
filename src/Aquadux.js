@@ -145,7 +145,8 @@ class Aquadux extends EventManager {
   }
   requirePipe(path) {
     if (!isNode) throw new Error("Aquadux not running in node.")
-    const rawPipe = require(path)
+    let rawPipe = require(path)
+    if (typeof rawPipe == 'function') rawPipe = [rawPipe]
     if (!Array.isArray(rawPipe)) throw new Error("The pipe file should export an array of parameters.")
     if (rawPipe.length > 3) throw new Error("The pipe file exports too many parameters")
     return this.createPipe(...rawPipe)
