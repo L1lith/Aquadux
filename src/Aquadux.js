@@ -154,7 +154,7 @@ class Aquadux extends EventManager {
   requirePipesFolder(path) {
     if (!isNode) throw new Error("Aquadux not running in node.")
     const scripts = getFiles(path, /.js$/)
-    if (scripts.length < 1) throw new Error("No pipes found in the target directory")
+    if (scripts.length < 1) console.warn(new Error("No pipes found in the target directory"))
     return scripts.map(this.requirePipe)
   }
 }
