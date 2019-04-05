@@ -1,7 +1,7 @@
 # Aquadux
 Aquadux is a solution to help you manage application flow, dependency injection, and promise handling.
 
-## Example
+## A Basic Example
 Here's a straightforward example to help you get into the library. See the documentation below for more details
 ```js
 const Aquadux = require('aquadux')
@@ -118,4 +118,14 @@ dux.start().then(()=>{
 }).catch(error => {
   console.log("The error handler was called") // The error handler is not called because pipe1 was allowed to fail.
 })
+```
+
+##### timeout
+Passing timeout value will cause the pipe to throw a timeout error after the specified number of milliseconds.
+```js
+dux.createPipe(()=>{
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, 1000)
+  })
+}, {timeout: 500}) // This pipe will throw a timeout error because the timeout is shorter than the time it takes for the promise to resolve.
 ```

@@ -53,6 +53,12 @@ class AquaPipe extends EventManager {
   }
   start() {
     this.started = true
+    if (isFinite(this.options.timeout) && this.options.timeout > 0) {
+      setTimeout(()=>{
+        if (this.finished === true) return
+        this.handleError(new Error(`Pipe Timed Out after ${Math.floor(this.options.timeout / 1000 * 100) / 100} seconds`))
+      }, this.options.timeout)
+    }
     let output
     try {
       output = this.func(this.data)
@@ -68,18 +74,21 @@ class AquaPipe extends EventManager {
     }
   }
   handleSuccess(output) {
+    if (this.finished === true) return
     this.output = output
     this.result = output
     this.handleFinished()
     this.eventListeners.success.forEach(listener => listener(output))
   }
   handleError(error) {
+    if (this.finished === true) return
     this.error = error
     this.result = error
     this.handleFinished()
     this.eventListeners.failure.forEach(listener => listener(error))
   }
   handleFinished() {
+    if (this.finished === true) return
     this.finished = true
     this.eventListeners.finished.forEach(listener => listener(this.result))
   }
