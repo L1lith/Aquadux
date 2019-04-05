@@ -1,6 +1,6 @@
 {
   "name": "aquadux",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easy dependency injection and promise pipelining",
   "main": "./src/index.js",
   "scripts": {
