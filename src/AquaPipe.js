@@ -81,6 +81,7 @@ class AquaPipe extends EventManager {
     this.eventListeners.success.forEach(listener => listener(output))
   }
   handleError(error) {
+    console.log('pee')
     if (this.finished === true) return
     this.error = error
     this.result = error

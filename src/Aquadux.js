@@ -2,6 +2,9 @@ const autoBind = require("auto-bind")
 const EventManager = require("./EventManager")
 const AquaPipe = require("./AquaPipe")
 const findPipeDependencies = require('./functions/findPipeDependencies')
+const {isBrowser, isNode} = require('browser-or-node')
+const getFiles = require('./functions/getFiles')
+
 
 class Aquadux extends EventManager {
   constructor() {
@@ -28,7 +31,7 @@ class Aquadux extends EventManager {
     }
   }
   createPipe(name=null, func, options={}) {
-    if (arguments.length < 1) throw new Error("Too Few Argument")
+    if (arguments.length < 1) throw new Error("Too Few Arguments")
     if (arguments.length > 3) throw new Error("Too Many Arguments")
     if (arguments.length === 1) {
       func=name
@@ -93,7 +96,6 @@ class Aquadux extends EventManager {
     if (circularPipes.length > 0) throw new Error(`Found Circular Pipes: "${circularPipes.slice(0, 3).join("\", ") + "\"" + (circularPipes.length > 3 ? ", continued" : "")}`)
     const startingPipes = this.getStartingPipes()
     if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
-    startingPipes.forEach(pipe => pipe.start())
     this.runPipes(Object.values(this.pipes)).then(output => {
       this.finish(output)
       this.eventListeners.success.forEach(listener => {
@@ -105,6 +107,7 @@ class Aquadux extends EventManager {
         listener(error)
       })
     })
+    startingPipes.forEach(pipe => pipe.start())
     this.eventListeners.started.forEach(listener => listener())
     return this.promise
   }
@@ -139,6 +142,18 @@ class Aquadux extends EventManager {
   }
   getStartingPipes() {
     return Object.values(this.pipes).filter(pipe => pipe.waitingFor.length === 0)
+  }
+  requirePipe(path) {
+    if (!isNode) throw new Error("Aquadux not running in node.")
+    const rawPipe = require(path)
+    if (!Array.isArray(rawPipe)) throw new Error("The pipe file should export an array of parameters.")
+    if (rawPipe.length > 3) throw new Error("The pipe file exports too many parameters")
+    return this.createPipe(...rawPipe)
+  }
+  requirePipesFolder(path) {
+    if (!isNode) throw new Error("Aquadux not running in node.")
+    const scripts = getFiles(path, /.js$/)
+    return scripts.map(this.requirePipe)
   }
 }
 

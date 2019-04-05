@@ -1,6 +1,6 @@
 {
   "name": "aquadux",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Easy dependency injection and promise pipelining",
   "main": "./src/index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/L1lith/Aquadux#readme",
   "dependencies": {
-    "auto-bind": "^2.0.0"
+    "auto-bind": "^2.0.0",
+    "browser-or-node": "^1.1.0"
   }
 }
