@@ -99,6 +99,16 @@ function pipe1() {
 
 module.exports = ["pipe1", pipe1]
 ```
+##### requirePipesFolder
+Expects a folder path, and then requires all the javascript files inside as pipes, similar to the requirePipe method above. Short Example
+```js
+const {Aquadux} = require('aquadux')
+const {join} = require('fs)
+
+const dux = new Aquadux()
+dux.requirePipesFolder(join(__dirname, "pipes")) // requires all the pipes in the "pipes" folder
+dux.start().catch(console.log)
+```
 
 #### Dependency Detection Under the Hood
 How does Aquadux know each pipes dependent pipes? Well Aquadux specifically looks for the first input parameter of the function to be using [object deconstruction syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter). As you can see above object deconstruction syntax looks like this `({googleHomePage})`. When Aquadux looks at the code of the function and sees the input parameters is using this syntax it takes the name of each object property we're using and automatically adds the pipe with that name as a dependency. If this doesn't make sense to you how Aquadux is doing this it's okay as long as you understand that using the deconstructive syntax is required to make Aquadux automatically make it a dependency.
