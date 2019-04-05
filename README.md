@@ -4,6 +4,60 @@ Aquadux is a solution to help you manage application flow, dependency injection,
 ## A Basic Example
 Here's a straightforward example to help you get into the library. See the documentation below for more details
 ```js
+const Aquadux = require('aquadux')
+
+const dux = new Aquadux()
+
+function timer(ms) { // A simple timer function to help us simulate asynchronous program flow
+  return new Promise(res => setTimeout(res, ms))
+}
+
+dux.createPipe('shopData' /* Here we supply it a name so we can depend upon it later */, async ()=>{
+  await timer(1000) // In reality we might be making a request to a backend
+  return {cartItems: ["Blue Dress", "Red Overcoat"]}
+})
+const mainScript = duct.createPipe(({shopData}) => { // Aquadux automatically detects this script is dependant upon the pipe named shopData, and waits for it to finish before calling this script
+  const {cartItems} = shopData
+  console.log(cartItems)
+})
+
+dux.start().then(pipeOutputs => {
+  console.log(pipeOutputs) // returns {shopData: {cartItems: ["Blue Dress", "Red Overcoat"]}, "unnamedPipe#1": undefined}
+}).catch(error => {
+  console.log(error) // The entire Aquadux rejects with the first error.
+})
+```
+
+## Documentation
+### The Aquadux Class
+#### The Basics
+The Aquadux class is the base of the library, when using the library you must first instantiate a Aquadux object
+```js
+const {Aquadux} = require('aquadux')
+
+const dux = new Aquadux()
+```
+
+
+Now we can use this object to create pipes. Pipes are simply functions (which can be asynchronous) that aquadux will automatically decide when to run depending on which other functions they are dependant upon. We must also supply them with a name string if other pipes are dependant upon them so Aquadux can know to pass them to the dependant pipes.
+```js
+const {writeFileSync} = require('fs')
+const {join} = require('path')
+const fetch = require('node-fetch')
+const {Aquadux} = require('aquadux')
+
+const dux = new Aquadux()
+
+dux.createPipe("googleHomePage", async ()=>{ // Here we supply the name so that Aquadux can tell that it is the pipe the next pipe is dependant upon
+  return await fetch("https://www.google.com/")
+})
+dux.createPipe(({googleHomePage})=>{
+  writeFileSync(join(__dirname, 'googleHomePage.html'))
+})
+```
+
+Once we have setup all of our pipes, we can start running the Aquadux instance. The Aquadux object has the .start method which will return a promise that will resolve when all of the pipes have run successfully, and will reject upon the first pipe that fails. If you would like to allow Aquadux to continue when a specific pipe has failed see the canFail option in the pipe object section.
+```js
 const {writeFileSync} = require('fs')
 const {join} = require('path')
 const fetch = require('node-fetch')
