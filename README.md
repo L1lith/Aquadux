@@ -103,7 +103,7 @@ module.exports = ["pipe1", pipe1]
 Expects a folder path, and then requires all the javascript files inside as pipes, similar to the requirePipe method above. Short Example
 ```js
 const {Aquadux} = require('aquadux')
-const {join} = require('fs)
+const {join} = require('fs')
 
 const dux = new Aquadux()
 dux.requirePipesFolder(join(__dirname, "pipes")) // requires all the pipes in the "pipes" folder
