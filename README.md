@@ -97,7 +97,7 @@ function pipe1() {
   console.log('hello')
 }
 
-module.exports = ["pipe1", pipe1]
+module.exports = pipe1
 ```
 ##### requirePipesFolder
 Expects a folder path, and then requires all the javascript files inside as pipes, similar to the requirePipe method above. Short Example
