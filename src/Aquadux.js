@@ -3,6 +3,7 @@ const EventManager = require("./EventManager")
 const AquaPipe = require("./AquaPipe")
 const findPipeDependencies = require('./functions/findPipeDependencies')
 const {isBrowser, isNode} = require('browser-or-node')
+const {basename} = isNode ? require('path') : {}
 const getFiles = require('./functions/getFiles')
 
 
@@ -43,6 +44,9 @@ class Aquadux extends EventManager {
       options = arguments[1]
     }
     if (typeof func != 'function') throw new Error("Function input must be a function")
+    if (name === null && func.name.length > 0 && func.name !== "anonymous" && !this.pipes.hasOwnProperty(func.name)) {
+      name = func.name
+    }
     if ((typeof name != 'string' || name.length < 1) && name !== null) throw new Error("Name must be either a non-empty string, null, or unsupplied.")
     if (typeof options != "object") throw new Error("Options must be an object or null")
     if (typeof name == 'string') {
@@ -148,6 +152,10 @@ class Aquadux extends EventManager {
     let rawPipe = require(path)
     if (typeof rawPipe == 'function') rawPipe = [rawPipe]
     if (!Array.isArray(rawPipe)) throw new Error("The pipe file should export an array of parameters.")
+    if (arguments.length < 3 && typeof arguments[0] != 'string') {
+      const name = basename(path)
+      if (!this.pipes.hasOwnProperty(name)) arguments.unshift(name)
+    }
     if (rawPipe.length > 3) throw new Error("The pipe file exports too many parameters")
     return this.createPipe(...rawPipe)
   }
