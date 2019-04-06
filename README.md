@@ -120,7 +120,7 @@ If you do not want to use the object deconstruction syntax but still want to hav
 When creating a pipe object it takes up to 3 parameters
 1. A name string (optional, defaults to the function name if it's a named function)
 2. The function for the pipe to run (required)
-3. An options object (optional)
+3. An options object (optional, you can read about pipe options below)
 It can look like any of these ways when creating a pipe, simply put the options in the right order, and then only supply the ones you need like so:
 ```js
 dux.createPipe(()=>{/*...function body*/})
