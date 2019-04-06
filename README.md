@@ -81,7 +81,7 @@ dux.start().then(pipeOutputs => {
 
 #### Methods
 ##### requirePipe
-Allows you to require a pipe from the filesystem, directly injecting it into the Aquadux instance. The pipe javascript file should export a function or an array of arguments (as if they were being used in createPipe). Here's an Example Project
+Allows you to require a pipe from the filesystem, directly injecting it into the Aquadux instance. The pipe javascript file should export a function or an array of arguments (as if they were being used in createPipe). If no name is supplied the pipes name will default to the file's name (unless it's taken). Here's an Example Project
 
 /index.js
 ```js
