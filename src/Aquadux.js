@@ -159,9 +159,9 @@ class Aquadux extends EventManager {
     if (rawPipe.length > 3) throw new Error("The pipe file exports too many parameters")
     return this.createPipe(...rawPipe)
   }
-  requirePipesFolder(path) {
+  requirePipesFolder(path, deep=false) {
     if (!isNode) throw new Error("Aquadux not running in node.")
-    const scripts = getFiles(path, /.js$/)
+    const scripts = getFiles(path, deep, /.js$/)
     if (scripts.length < 1) console.warn(new Error("No pipes found in the target directory"))
     return scripts.map(this.requirePipe)
   }
