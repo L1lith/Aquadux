@@ -152,9 +152,9 @@ class Aquadux extends EventManager {
     let rawPipe = require(path)
     if (typeof rawPipe == 'function') rawPipe = [rawPipe]
     if (!Array.isArray(rawPipe)) throw new Error("The pipe file should export an array of parameters.")
-    if (arguments.length < 3 && typeof arguments[0] != 'string') {
+    if (rawPipe.length < 3 && typeof rawPipe[0] != 'string') {
       const name = basename(path)
-      if (!this.pipes.hasOwnProperty(name)) arguments.unshift(name)
+      if (!this.pipes.hasOwnProperty(name)) rawPipe.unshift(name)
     }
     if (rawPipe.length > 3) throw new Error("The pipe file exports too many parameters")
     return this.createPipe(...rawPipe)
