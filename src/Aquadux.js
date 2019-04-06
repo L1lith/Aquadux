@@ -8,9 +8,12 @@ const getFiles = require('./functions/getFiles')
 
 
 class Aquadux extends EventManager {
-  constructor() {
+  constructor(options={}) {
     super()
+    if (typeof options != 'object') throw new Error("Options must be an object, unsupplied, or null")
+    if (options === null) options = {}
     autoBind(this)
+    this.options = options
     this.started = false
     this.finished = false
     this.pipes = {}
@@ -100,22 +103,30 @@ class Aquadux extends EventManager {
     if (circularPipes.length > 0) throw new Error(`Found Circular Pipes: "${circularPipes.slice(0, 3).join("\", ") + "\"" + (circularPipes.length > 3 ? ", continued" : "")}`)
     const startingPipes = this.getStartingPipes()
     if (startingPipes.length < 1) throw new Error(`No valid starting pipes.`)
-    this.runPipes(Object.values(this.pipes)).then(output => {
-      this.finish(output)
-      this.eventListeners.success.forEach(listener => {
-        listener(output)
-      })
-    }).catch(error => {
-      this.finish(error)
-      this.eventListeners.failure.forEach(listener => {
-        listener(error)
-      })
-    })
+    this.runPipes(Object.values(this.pipes)).then(this.succeed).catch(this.throw)
     startingPipes.forEach(pipe => pipe.start())
+    if (isFinite(this.options.timeout) && this.options.timout > 0) {
+      this.throw(new Error(`Aquadux Timed Out after ${Math.floor(this.options.timeout / 1000 * 100) / 100} seconds`))
+    }
     this.eventListeners.started.forEach(listener => listener())
     return this.promise
   }
+  succeed(output) {
+    if (this.finished === true) return
+    this.finish(output)
+    this.eventListeners.success.forEach(listener => {
+      listener(output)
+    })
+  }
+  throw(error) {
+    if (this.finished === true) return
+    this.finish(error)
+    this.eventListeners.failure.forEach(listener => {
+      listener(error)
+    })
+  }
   finish(result) {
+    if (this.finished === true) return
     this.finished = true
     this.eventListeners.finished.forEach(listener => listener(result))
   }
